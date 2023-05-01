@@ -1,4 +1,6 @@
 /node_modules
 /venv
 
-dbConnection.py
+config.py
+
+/__pycache__
