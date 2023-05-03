@@ -1,6 +1,7 @@
+# Файлы, связанные с модификацией VSCode
 /node_modules
+
+# Файлы, являющиеся частью проекта 
 /venv
-
 config.py
-
-/__pycache__
+__pycache__
