@@ -7,3 +7,6 @@ from .config import API_TOKEN
 # Инициализация бота и диспетчера
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
+
+
+groupName = "СУБД-1"

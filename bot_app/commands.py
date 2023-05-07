@@ -8,6 +8,8 @@ from bot_app.config import connection
 from bot_app import messages
 
 from bot_app import dp
+import SQLCommands
+
 
 # Первый запуск
 @dp.message_handler(commands=['start'])
@@ -15,6 +17,7 @@ async def start(message: types.Message):
     await message.reply(messages.GREETINGS)
 
 
+# Показ кнопок для получения расписания
 @dp.message_handler(commands=['schedule'])
 async def buttons(message: types.Message):
     buttons = [
@@ -28,11 +31,79 @@ async def buttons(message: types.Message):
     await message.answer(text="Расписание на:", reply_markup=keyboard)
 
 
+# Получение расписания на сегодня
+@dp.message_handler(regexp=f"{messages.TODAY}")
+async def getTodayLessons(message: types.Message):
+    try:
+        cursor = connection.cursor()
+        cursor.execute(SQLCommands.allTodaySchedule)
+        dbData = cursor.fetchall()
+
+        if (dbData != []):
+            return await message.answer(dbData)
+
+        return await message.answer(messages.NO_TODAY)
+    except:
+        await message.answer(messages.SOMETHING_BROKEN)
+
+
+# Получение расписания на завтра
+@dp.message_handler(regexp=f"{messages.TOMOROW}")
+async def getTomorowLessons(message: types.Message):
+    try:
+        cursor = connection.cursor()
+        cursor.execute(SQLCommands.allTomorrowSchedule)
+        dbData = cursor.fetchall()
+
+        if (dbData != []):
+            return await message.answer(dbData)
+
+        return await message.answer(messages.NO_TOMORROW)
+    except:
+        await message.answer(messages.SOMETHING_BROKEN)
+
+
+# Получение расписания на эту неделю
+@dp.message_handler(regexp=f"{messages.THIS_WEEK}")
+async def getThisWeekLessons(message: types.Message):
+    try:
+        cursor = connection.cursor()
+        # todo добавить запрос на получение данных
+        cursor.execute("")
+        dbData = cursor.fetchall()
+
+        if (dbData != []):
+            return await message.answer(dbData)
+
+        return await message.answer(messages.NO_THIS_WEEK)
+
+    except:
+        await message.answer(messages.SOMETHING_BROKEN)
+
+
+# Получение расписания на следующую неделю
+@dp.message_handler(regexp=f"{messages.NEXT_WEEK}")
+async def getNextWeekLessons(message: types.Message):
+    try:
+        cursor = connection.cursor()
+
+        # todo добавить запрос на получение данных
+        cursor.execute("")
+        dbData = cursor.fetchall()
+
+        if (dbData != []):
+            return await message.answer(dbData)
+
+        return await message.answer(messages.NO_NEXT_WEEK)
+    except:
+        await message.answer(messages.SOMETHING_BROKEN)
+
+
 # Любой текст, который не попал в остальные команды
 @dp.message_handler()
 async def allMessagesHandler(message: types.Message):
     cursor = connection.cursor()
-    cursor.execute("SELECT id, name FROM personnel_user")
+    cursor.execute(SQLCommands.allPersonnelUser)
 
     dbData = cursor.fetchall()
 
