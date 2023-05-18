@@ -2,7 +2,7 @@
 
 from aiogram import Bot, Dispatcher
 
-from .config import API_TOKEN
+from .settings import API_TOKEN
 
 # Инициализация бота и диспетчера
 bot = Bot(token=API_TOKEN)

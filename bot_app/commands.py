@@ -4,17 +4,17 @@
 
 from aiogram import types
 
-from bot_app.config import connection
+from bot_app.settings import connection
 from bot_app import messages
 
 from bot_app import dp
-from bot_app.SQLCommands import *
+from bot_app.helpers import *
 
 import bot_app.data_fetcher as data_fetcher
-import datetime
+
 from bot_app.settings import Student as StudentData
 
-StudentData # Здесь должна проходить авторизация пользователя, и инициализация дата класса студента
+StudentData  # Здесь должна проходить авторизация пользователя, и инициализация дата класса студента
 
 
 # Первый запуск
@@ -36,9 +36,8 @@ async def buttons(message: types.Message):
         keyboard=buttons, one_time_keyboard=True)
     await message.answer(text="Расписание на:", reply_markup=keyboard)
 
+
 # Получить расписание по ID даты в базе расписаний
-
-
 async def getLessonsByDate(message: types.Message, date_id):
     lessons = ''
 
@@ -65,25 +64,22 @@ async def getLessonsByDate(message: types.Message, date_id):
     else:
         await message.reply(messages.NO_LESSONS)
 
+
 # Получить занятия на текущий день
-
-
 @dp.message_handler(regexp=f"{messages.TODAY}")
 async def getTodayLessons(messages: types.Message):
     date_id = data_fetcher.get_date_id(getTodayDate())
     await getLessonsByDate(messages, date_id=date_id)
 
+
 # Получить занатия на следующий день от текущего
-
-
 @dp.message_handler(regexp=f"{messages.TOMOROW}")
 async def getTomorrowLessons(messages: types.Message):
-    date_id = data_fetcher.get_date_id(getTomorrowDate)
+    date_id = data_fetcher.get_date_id(getTomorrowDate())
     await getLessonsByDate(messages, date_id=date_id)
 
+
 # Получение расписания на эту неделю
-
-
 @dp.message_handler(regexp=f"{messages.THIS_WEEK}")
 async def getThisWeekLessons(message: types.Message):
     try:
@@ -120,21 +116,21 @@ async def getNextWeekLessons(message: types.Message):
 
 
 # Любой текст, который не попал в остальные команды
-@dp.message_handler()
-async def allMessagesHandler(message: types.Message):
-    cursor = connection.cursor()
-    cursor.execute(allPersonnelUser)
+# @dp.message_handler()
+# async def allMessagesHandler(message: types.Message):
+#     cursor = connection.cursor()
+#     cursor.execute(allPersonnelUser)
 
-    dbData = cursor.fetchall()
+#     dbData = cursor.fetchall()
 
-    try:
-        intUserWithId = dbData[int(message.text) - 1]
-        userName = intUserWithId[1]
+#     try:
+#         intUserWithId = dbData[int(message.text) - 1]
+#         userName = intUserWithId[1]
 
-        await message.answer(intUserWithId)
-        await message.answer(userName)
-    except:
-        await message.answer(f"Введите целое число от 1 до {len(dbData)}")
+#         await message.answer(intUserWithId)
+#         await message.answer(userName)
+#     except:
+#         await message.answer(f"Введите целое число от 1 до {len(dbData)}")
 
 
 # TODO:

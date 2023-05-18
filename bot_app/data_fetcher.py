@@ -1,7 +1,6 @@
 import aiohttp
 import requests
-from .config import GET_LESSON_BY_DATE, GET_DATE_ID
-
+from .settings import GET_LESSON_BY_DATE, GET_DATE_ID
 
 def get_date_id(date:str):
     try:
