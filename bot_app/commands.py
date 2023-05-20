@@ -37,7 +37,7 @@ async def buttons(message: types.Message):
     await message.answer(text=messages.START_SCHEDULE, reply_markup=keyboard)
 
 
-# Получить расписание по ID даты в базе расписаний
+# ===== ПОЛУЧИТЬ РАСПИСАНИЕ ПО ID ДАТЫ  =====
 async def getLessonsByDateID(message: types.Message, date_id: int):
     # Если расписание найдено, то выводим занятие с соответствующей датой
     # Иначе пишем, что занятий в расписании нет
@@ -61,25 +61,26 @@ async def getTodayLessons(messages: types.Message):
     await getLessonsByDateID(messages, date_id=date_id)
 
 
-# Получить занатия на следующий день от текущего
+# Получить занятия на следующий день от текущего
 @dp.message_handler(regexp=f"{messages.TOMOROW}")
 async def getTomorrowLessons(messages: types.Message):
     date_id = data_fetcher.get_date_id(getTomorrowDate())
     await getLessonsByDateID(messages, date_id=date_id)
 
 
+# ===== ПОЛУЧИТЬ ЗАНЯТИЯ ПО НОМЕРУ НЕДЕЛИ =====
 async def getLessonsByWeekNumber(message: types.Message, week_number:int):
     res = await data_fetcher.get_week_lessons(StudentData.group_id, week_number)
     return await message.reply(fillLessonsMessage(res=res))
 
 
-# Получение расписания на первую неделю
+# Получение расписания на текущую неделю
 @dp.message_handler(regexp=f"{messages.THIS_WEEK}")
 async def getThisWeekLessons(message: types.Message):
     await getLessonsByWeekNumber(message=message, week_number=getWeekNumber())
 
 
-# Получение расписания на вторую неделю
+# Получение расписания на следующую неделю
 @dp.message_handler(regexp=f"{messages.NEXT_WEEK}")
 async def getNextWeekLessons(message: types.Message):
     week_number = getWeekNumber()
