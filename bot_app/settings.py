@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 import string
-import mysql.connector
 from dotenv import load_dotenv
 import os
 
@@ -16,20 +15,21 @@ class Student:
     group_id: int = 8
     group_name: str = 'СКЗ-2'
 
-
-connection = mysql.connector.connect(
-    host=os.environ.get('HOST'),
-    user=os.environ.get('DB_USER'),
-    password=os.environ.get('PASSWORD'),
-    database=os.environ.get('DATABASE'))
-
 API_TOKEN = os.environ.get('API_TOKEN')
 
 HOST = 'http://127.0.0.1:8000'
 
-API_MODULE = 'schedule'
+SCHEDULE_API = 'schedule'
 
-GET_LESSON_BY_DATE = string.Template(
-    f'{HOST}/{API_MODULE}/lessons/group/$group_id/date/$date_id')
+STUDENTS_API = 'students'
 
-GET_DATE_ID = string.Template(f'{HOST}/{API_MODULE}/lesson-date/$date')
+GET_LESSONS_BY_DATE = string.Template(
+    f'{HOST}/{SCHEDULE_API}/lessons/group/$group_id/date/$date_id')
+
+GET_LESSONS_BY_WEEK = string.Template(
+    f'{HOST}/{SCHEDULE_API}/lessons/group/$group_id/week/$week_number')
+
+GET_DATE_ID = string.Template(f'{HOST}/{SCHEDULE_API}/lesson-date/$date')
+
+GET_GROUP_ID = string.Template(
+    f'{HOST}/{STUDENTS_API}/group-name/$group_name')
