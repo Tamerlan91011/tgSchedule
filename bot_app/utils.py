@@ -4,15 +4,15 @@ from bot_app import messages
 from types import CoroutineType
 
 # Получение сегодняшней даты
-def getTodayDate():
+def returnTodayDate():
     return date.today()
 
 # Получение завтрашней даты
-def getTomorrowDate():
+def returnTomorrowDate():
     return date.today() + timedelta(days=1)
 
 
-def getWeekNumber():
+def returnWeekNumber():
     week = (date.today().isocalendar()[1]) % 2
 
     # Если неделя четная, то она в расписании обозначается, как вторая неделя.
