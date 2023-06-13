@@ -11,9 +11,11 @@ load_dotenv('.env')
 
 @dataclass
 class Student:
-    student_card_number: int
-    group_id: int = 8
-    group_name: str = 'СКЗ-2'
+    student_card_number: int = 0
+    password: str = 'admin'
+    group_id: int = 0
+    group_name: str = 'Админ'
+    username: str = 'Админ'
 
 API_TOKEN = os.environ.get('API_TOKEN')
 
@@ -33,3 +35,6 @@ GET_DATE_ID = string.Template(f'{HOST}/{SCHEDULE_API}/lesson-date/$date')
 
 GET_GROUP_ID = string.Template(
     f'{HOST}/{STUDENTS_API}/group-name/$group_name')
+
+GET_STUDENT_TELEGRAM_ID = string.Template(
+    f'{HOST}/{STUDENTS_API}/telegram/$telegram_id')

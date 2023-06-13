@@ -12,20 +12,54 @@ import bot_app.data_fetcher as data_fetcher
 
 from bot_app.settings import Student as StudentData
 
-# Здесь должна проходить авторизация пользователя, и инициализация дата класса студента
+from aiogram.dispatcher.filters.state import StatesGroup, State
+from aiogram.dispatcher import FSMContext
 
-StudentData.group_id = data_fetcher.getGroupID('ППСА-3')
-
+class Authorization(StatesGroup):
+    student_card_number = State()
+    password = State()
+    authorized = State()
 
 # Первый запуск
 @dp.message_handler(commands=['start'])
 async def startDialog(message: types.Message):
-    await message.reply(messages.GREETINGS.substitute(user=message.from_user.username))
+    student_data = await data_fetcher.getStudentByTelegramID(message.from_user.id)
+    
+    if not student_data:
+        await message.answer(f'''{
+                            messages.GREETINGS.substitute(user=message.from_user.username)}''')
+    else:
+        StudentData.username = student_data.get('name')
+        StudentData.group_name = student_data.get('group').get('name')
+        StudentData.group_id = data_fetcher.getGroupID(StudentData.group_name)
+        await message.answer(f'''С возвращением, {StudentData.username}''')
+        await Authorization.authorized.set()
+
+
+# @dp.message_handler(commands=['login'])
+# async def startDialog(message: types.Message):
+
+#     await message.answer(f'''Введите номер вашего студенческого билета''')
+#     await Authorization.student_card_number.set()
+
+# @dp.message_handler(state=Authorization.student_card_number)
+# async def getStudentCardName(message: types.Message, state:FSMContext):
+#     StudentData.student_card_number = await message.text
+#     await state.update_data(student_card_number=message.text)
+#     await message.answer('Теперь введите ваш пароль')
+#     await Authorization.password.set()
+    
+# @dp.message_handler(state=Authorization.password)
+# async def getStudentCardName(message: types.Message, state:FSMContext):
+#     StudentData.password = await message.text
+    
+#     await message.answer('Ваши данные получены. Осуществляю поиск в базе')
+#     await state.finish()
 
 
 # Показ кнопок для получения расписания
-@dp.message_handler(commands=['schedule'])
-async def showButtons(message: types.Message):
+@dp.message_handler(state=Authorization.authorized)
+async def showButtons(message: types.Message, state: FSMContext):
     
     today_button = types.KeyboardButton(text="Занятия сегодня")
     tommorow_button = types.KeyboardButton(text="Занятия завтра")
@@ -37,7 +71,9 @@ async def showButtons(message: types.Message):
         one_time_keyboard=False, resize_keyboard=True
     ).row(today_button, tommorow_button).row(this_week_button, next_week_button)
 
-    await message.answer(text=messages.START_SCHEDULE, reply_markup=keyboard)
+    await message.answer(text=f'''{
+                         messages.START_SCHEDULE.substitute(user=StudentData.username, group_name=StudentData.group_name)}''', reply_markup=keyboard)
+    await state.finish()
 
 
 # ===== ОТПРАВИТЬ РАСПИСАНИЕ ПО ID ДАТЫ  =====
@@ -74,8 +110,11 @@ async def sendTomorrowLessons(messages: types.Message):
 # ===== ОТПРАВИТЬ ЗАНЯТИЯ ПО НОМЕРУ НЕДЕЛИ =====
 async def sendLessonsByWeekNumber(message: types.Message, week_number: int):
     res = await data_fetcher.getWeekLessons(StudentData.group_id, week_number)
-    return await message.reply(f'Занятия {week_number}-ой недели\n' + utils.fillLessonsMessage(res=res))
-
+    
+    if res:
+        return await message.reply(f'Занятия {week_number}-ой недели\n' + utils.fillLessonsMessage(res=res))
+    else:
+        await message.reply(messages.NO_LESSONS)
 
 # Отправить расписание на текущую неделю
 @dp.message_handler(lambda msg: any(word in msg.text.lower() for word in messages.THIS_WEEK))

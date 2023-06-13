@@ -39,3 +39,22 @@ async def getWeekLessons(group_id: int, week_number: int):
                 return await resp.json()
     except aiohttp.ClientConnectionError:
         return 0
+    
+async def getStudentByTelegramID(telegram_id: int):
+    try:
+        async with aiohttp.ClientSession() as session:
+            request = GET_STUDENT_TELEGRAM_ID.substitute(telegram_id=telegram_id)
+            async with session.get(request) as resp:
+                return await resp.json()
+    except aiohttp.ClientConnectionError and aiohttp.ContentTypeError:
+        return 0
+    
+    
+async def updateStudentData(student_card_number: int, password: str):
+    try:
+        async with aiohttp.ClientSession() as session:
+            request = GET_STUDENT_TELEGRAM_ID.substitute()
+            async with session.get(request) as resp:
+                return await resp.json()
+    except aiohttp.ClientConnectionError and aiohttp.ContentTypeError:
+        return 0
